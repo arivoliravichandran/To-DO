@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Todo App</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .todo-item {
+            transition: all 0.3s ease;
+        }
+
+        .todo-item:hover {
+            transform: translateX(5px);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-2xl">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">Todo App</h1>
+
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <form id="todo-form" class="flex gap-2">
+                <input type="text" id="todo-input"
+                    class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+                    placeholder="Add a new todo..." required>
+                <button type="submit"
+                    class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                    Add
+                </button>
+            </form>
+        </div>
+
+        <div id="todo-list" class="space-y-3">
+            <!-- Todo items will be inserted here -->
+        </div>
+    </div>
+
+    <script>
+        const todoForm = document.getElementById('todo-form');
+        const todoInput = document.getElementById('todo-input');
+        const todoList = document.getElementById('todo-list');
+
+        // Fetch all todos
+        async function fetchTodos() {
+            const response = await fetch('/api/todos');
+            const todos = await response.json();
+            displayTodos(todos);
+        }
+
+        // Display todos
+        function displayTodos(todos) {
+            todoList.innerHTML = todos.map(todo => `
+                <div class="todo-item bg-white rounded-lg shadow-md p-4 flex items-center justify-between" data-id="${todo.id}">
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" 
+                               ${todo.completed ? 'checked' : ''} 
+                               onchange="toggleTodo(${todo.id}, this.checked)"
+                               class="w-5 h-5 rounded border-gray-300 text-blue-500 focus:ring-blue-500">
+                        <span class="${todo.completed ? 'line-through text-gray-500' : 'text-gray-800'}">
+                            ${todo.title}
+                        </span>
+                    </div>
+                    <button onclick="deleteTodo(${todo.id})" 
+                            class="text-red-500 hover:text-red-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Add new todo
+        todoForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = todoInput.value.trim();
+            if (!title) return;
+
+            await fetch('/api/todos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title }),
+            });
+
+            todoInput.value = '';
+            fetchTodos();
+        });
+
+        // Toggle todo completion
+        async function toggleTodo(id, completed) {
+            await fetch(`/api/todos/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ completed }),
+            });
+            fetchTodos();
+        }
+
+        // Delete todo
+        async function deleteTodo(id) {
+            await fetch(`/api/todos/${id}`, {
+                method: 'DELETE',
+            });
+            fetchTodos();
+        }
+
+        // Initial load
+        fetchTodos();
+    </script>
+</body>
+
+</html>
