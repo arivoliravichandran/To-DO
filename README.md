@@ -1,6 +1,6 @@
 # Flask Todo App
 
-A simple and modern Todo application built with Flask and SQLite.
+A simple and modern Todo application built with Flask and SQLite, with Docker support for easy deployment.
 
 ## Features
 
@@ -9,8 +9,11 @@ A simple and modern Todo application built with Flask and SQLite.
 - Modern UI with Tailwind CSS
 - RESTful API endpoints
 - SQLite database for persistence
+- Docker support for containerized deployment
 
 ## Setup
+
+### Option 1: Local Development
 
 1. Create a virtual environment (recommended):
 
@@ -37,6 +40,38 @@ python app.py
 http://localhost:5000
 ```
 
+### Option 2: Docker Deployment
+
+1. Build the Docker image:
+
+```bash
+docker build -t flask-todo-app .
+```
+
+2. Run the container:
+
+```bash
+docker run -p 5000:5000 flask-todo-app
+```
+
+3. Access the application at:
+
+```
+http://localhost:5000
+```
+
+## Project Structure
+
+```
+.
+├── app.py              # Main application file
+├── requirements.txt    # Python dependencies
+├── templates/          # HTML templates
+├── instance/          # Database and configuration files
+├── dockerfile         # Docker configuration
+└── README.md          # Project documentation
+```
+
 ## API Endpoints
 
 - `GET /api/todos` - Get all todos
@@ -46,8 +81,13 @@ http://localhost:5000
 
 ## Technologies Used
 
-- Flask
-- SQLAlchemy
-- SQLite
-- Tailwind CSS
-- JavaScript (Vanilla)
+- Flask - Web framework
+- SQLAlchemy - Database ORM
+- SQLite - Database
+- Tailwind CSS - Styling
+- JavaScript (Vanilla) - Frontend interactivity
+- Docker - Containerization
+
+## Contributing
+
+Feel free to submit issues and enhancement requests!
